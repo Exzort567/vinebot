@@ -25,6 +25,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L14.732 3.732z" />
                 </svg>
             </button>
+            
         </div>
 
         <div class="flex-1 overflow-y-auto">
@@ -64,6 +65,7 @@
                     <div class="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 mb-4">
                         Hello, I'm VineBot
                     </div>
+                    <img src="{% static 'images/vinebotLogo.png' %}" alt="logo" class="mx-auto w-20 h-15">
                     <p class="text-2xl text-gray-400">How can I help you today?</p>
                 </div>
 
@@ -157,9 +159,7 @@
             botMessageEl.className = "flex items-start gap-4";
             botMessageEl.innerHTML = `
                 <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M10 2a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0V4.46L8.03 5.97a.75.75 0 01-.98-1.12L10 2zm-3.5.75a.75.75 0 01.75-.75h3.5a.75.75 0 010 1.5h-3.5a.75.75 0 01-.75-.75zM10 18a.75.75 0 01-.75-.75v-3.5a.75.75 0 011.5 0v3.04l1.97-1.47a.75.75 0 11.98 1.12L10 18zm3.5-.75a.75.75 0 01-.75.75h-3.5a.75.75 0 010-1.5h3.5a.75.75 0 01.75.75z" clip-rule="evenodd" />
-                    </svg>
+                    <img src="{% static 'images/vinebotLogo.png' %}" alt="logo" class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
                 </div>
                 <div class="flex-1 pt-1">
                     <p class="font-semibold">VineBot</p>
