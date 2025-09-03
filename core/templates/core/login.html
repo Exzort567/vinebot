@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Login - VineBot{% endblock %}
+{% block content %}
+
+<div class="h-screen w-full flex items-center justify-center bg-cover bg-center"
+     style="background-image: url('{% static "images/bg.jpg" %}');">
+
+  <!-- Card -->
+  <div class="bg-black rounded-2xl shadow-xl p-8 w-96 text-center">
+    
+    <!-- Logo -->
+    <div class="bg-white rounded-2xl p-2 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+      <img src="{% static 'images/bg.jpg' %}" alt="Logo" class="w-20 h-16 object-contain">
+    </div>
+
+    <!-- Welcome -->
+    <h2 class="text-white text-xl font-semibold mb-6">Welcome back</h2>
+
+    <!-- Google Login -->
+    <a href="{% url 'social:begin' 'google' %}" 
+       class="flex items-center justify-center gap-2 w-full py-3 mb-6 bg-gray-900 rounded-lg shadow hover:bg-gray-700 transition">
+      <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google" class="w-5 h-5">
+      <span class="text-white font-medium">Login with Google</span>
+    </a>
+
+    <!-- Signup -->
+    <p class="text-gray-200 text-sm">
+      Don’t have an account? 
+      <a href="#" class="text-green-400 hover:underline">Sign up</a>
+    </p>
+  </div>
+</div>
+
+{% endblock %}
