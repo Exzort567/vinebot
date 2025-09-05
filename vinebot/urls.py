@@ -18,7 +18,8 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin', include('admin_dashboard.urls')),
+    path('superadmin/', admin.site.urls),  # Django default admin panel
+    path('admin_dashboard/', include(('admin_dashboard.urls', 'admin_dashboard'), namespace='admin_dashboard')),
     path('', include('core.urls')),
-    path('auth/', include('social_django.urls', namespace='social'))
+    path('auth/', include('social_django.urls', namespace='social')),
 ]
