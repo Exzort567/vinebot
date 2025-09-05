@@ -168,6 +168,11 @@
     </style>
 
     <script>
+        window.addEventListener("pageshow", function (event) {
+            if (event.persisted) {
+                window.location.reload();  // forces re-check with server
+            }
+        });
         function showSection(sectionId, element) {
             // Hide all sections
             document.querySelectorAll('main section').forEach(section => {

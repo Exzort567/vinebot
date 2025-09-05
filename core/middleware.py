@@ -1,8 +1,11 @@
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.cache import add_never_cache_headers
+from django.shortcuts import redirect
+from django.conf import settings
 
 class NoCacheMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
-        if request.user.is_authenticated:
-            add_never_cache_headers(response)
+        # Add cache control headers to prevent storing sensitive pages
+        response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
         return response
