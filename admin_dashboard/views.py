@@ -6,12 +6,12 @@ from django.views.decorators.cache import never_cache
 @login_required(login_url='/')
 @never_cache
 def dashboard(request):
-    try:
-        allowed = AllowedUser.objects.get(email__iexact=request.user.email, is_active=True)
-    except AllowedUser.DoesNotExist:
-        return redirect('denied')
+    allowed = AllowedUser.objects.filter(
+        email__iexact=request.user.email, is_active=True
+    ).first()
 
-    if allowed.role != 'admin':
+    if not allowed or allowed.role != "admin":
         return redirect('denied')
-
-    return render(request, 'admin_dashboard/dashboard.html')
+    
+    users = AllowedUser.objects.all()
+    return render(request, 'admin_dashboard/dashboard.html', {"users": users})
