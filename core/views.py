@@ -11,17 +11,23 @@ def login_page(request):
 @never_cache
 def post_login(request):
     email = request.user.email
+    print(f"[DEBUG] post_login called for {email}")
+
     try:
         allowed = AllowedUser.objects.get(email__iexact=email, is_active=True)
+        print(f"[DEBUG] AllowedUser found: {allowed.email}, role={allowed.role}")
     except AllowedUser.DoesNotExist:
+        print(f"[DEBUG] No AllowedUser found for {email}, logging out...")
         auth_logout(request)
         return redirect('denied')
 
-    # Decide where to redirect based on role
     if allowed.role.strip().lower() == "admin":
+        print("[DEBUG] Redirecting to admin dashboard")
         return redirect('admin_dashboard:dashboard')
 
+    print("[DEBUG] Redirecting to chatbot")
     return redirect('chatbot')
+
 
 @login_required(login_url='/')
 @never_cache
