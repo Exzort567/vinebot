@@ -181,7 +181,7 @@
             });
 
             // --- Form Submission ---
-            chatForm.addEventListener('submit', (e) => {
+            chatForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const message = chatInput.value.trim();
                 if (!message) return;
@@ -197,9 +197,21 @@
                 sendBtn.disabled = true;
 
                 // Simulate bot response
-                setTimeout(() => {
-                    appendMessage('bot', `This is a simulated response to: "${message}"`);
-                }, 1000);
+                try{
+                    const response = await fetch("{% url 'chat_api' %}", {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify({message: message}),
+                    });
+                    const data = await response.json();
+                    if (data.reply) {
+                        appendMessage('bot', data.reply);
+                    } else {
+                        appendMessage('bot', "Sorry, I couldn't generate a response")
+                    }
+                } catch (error){
+                    appendMessage('bot', "Error:" + error.message)
+                }
             });
 
             // --- Suggestion Cards ---

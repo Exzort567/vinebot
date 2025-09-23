@@ -3,6 +3,30 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout as auth_logout
 from .models import AllowedUser
 from django.views.decorators.cache import never_cache
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .chatbot_model_handler import ModelHandler
+import os
+from dotenv import load_dotenv
+import json
+
+load_dotenv()
+
+SPACE_NAME = os.getenv("SPACE_NAME")
+model_handler = ModelHandler(SPACE_NAME)
+
+
+@csrf_exempt
+def chat_api(request):
+    if request.method == "POST":
+        body = json.loads(request.body.decode("utf-8"))
+        user_message = body.get("message", "")
+        if not user_message:
+            return JsonResponse({"error": "Message is required"}, status=400)
+
+        bot_reply = model_handler.generate_response(user_message)
+        return JsonResponse({"reply": bot_reply})
+    return JsonResponse({"error": "Invalid request method"}, status=405)
 
 def login_page(request):
     return render(request, 'core/login.html')
