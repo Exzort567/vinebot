@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout as auth_logout
-from .models import AllowedUser
+from .models import AllowedUser, Chat, Message
+from django.contrib.auth.models import User
+from django.views.decorators.http import require_http_methods
 from django.views.decorators.cache import never_cache
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -15,16 +17,99 @@ load_dotenv()
 SPACE_NAME = os.getenv("SPACE_NAME")
 model_handler = ModelHandler(SPACE_NAME)
 
+# Create new chat
+@login_required
+@csrf_exempt
+@require_http_methods(["POST"])
+def new_chat(request):
+    chat = Chat.objects.create(user=request.user)
+    return JsonResponse({"chat_id": chat.id, "title": chat.title})
+
+# Get all chats for the logged in user
+@login_required
+def chat_history(request):
+    chats = Chat.objects.filter(user=request.user).order_by("-created_at")
+    return JsonResponse({
+        "chats": [
+            {"id": chat.id, "title": chat.title or f"Chat {chat.id}"}
+            for chat in chats
+        ]
+    })
+
+# Get message in chat
+@login_required
+def get_chat(request, chat_id):
+    try:
+        chat = Chat.objects.get(id=chat_id, user=request.user)
+    except Chat.DoesNotExist:
+        return JsonResponse({"error": "Chat not found"}, status=404)
+    
+    messages = chat.messages.order_by("timestamp").values("sender", "content", "timestamp")
+    return JsonResponse(list(messages), safe=False)
+
+# Rename chat
+@login_required
+@csrf_exempt
+@require_http_methods(["POST"])
+def rename_chat(request, chat_id):
+    try:
+        chat = Chat.objects.get(id=chat_id, user=request.user)
+    except Chat.DoesNotExist:
+        return JsonResponse({"error": "Chat not found"}, status=400)
+
+    body = json.loads(request.body.decode("utf-8"))
+    new_title = body.get("title")
+
+    if new_title:
+        chat.title = new_title
+        chat.save()
+        return JsonResponse({"success": True, "title": new_title})
+    return JsonResponse({"error": "No title provided"}, status=404)
+
+# Delete chat
+@login_required
+@csrf_exempt
+@require_http_methods(["POST", "DELETE"])
+def delete_chat(request, chat_id):
+    try:
+        chat = Chat.objects.get(id=chat_id, user=request.user)
+        chat.delete()
+        return JsonResponse({"Success": True})
+    except Chat.DoesNotExist:
+        return JsonResponse({"error": "Chat not found"}, status=404)
+    
+
 
 @csrf_exempt
+@login_required
 def chat_api(request):
     if request.method == "POST":
         body = json.loads(request.body.decode("utf-8"))
         user_message = body.get("message", "")
-        if not user_message:
-            return JsonResponse({"error": "Message is required"}, status=400)
+        chat_id = body.get("chat_id")
 
+        if not user_message or not chat_id:
+            return JsonResponse({"error": "Message and chat_id is required"}, status=400)
+        
+        try:
+            chat = Chat.objects.get(id=chat_id, user=request.user)
+        except Chat.DoesNotExist:
+            return JsonResponse({"error": "Chat not found"}, status=404)
+        
+        # Save user message
+        Message.objects.create(chat=chat, sender="user", content=user_message)
+        
+        if chat.title == "New Chat":
+            title = user_message[:25] + ("..." if len(user_message) > 25 else "")
+            chat.title = title
+            chat.save()
+
+        # Generate bot response
         bot_reply = model_handler.generate_response(user_message)
+
+        # Save bot response
+        Message.objects.create(chat=chat, sender="bot", content=bot_reply)
+
         return JsonResponse({"reply": bot_reply})
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
