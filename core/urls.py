@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from django.contrib.auth import views as auth_views
 
@@ -6,6 +6,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('', views.login_page, name='login'),
     path('post-login/', views.post_login, name='post_login'),
+    path('', include('social_django.urls', namespace='social')),
     path('chatbot/', views.chatbot_page, name='chatbot'),
     path('denied/', views.access_denied, name='denied'),
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
