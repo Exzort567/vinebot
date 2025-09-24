@@ -6,10 +6,8 @@
 {% block content %}
 <div class="bg-gray-800 text-gray-200 flex h-screen overflow-hidden">
 
-    <!-- Sidebar Overlay for mobile -->
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
 
-    <!-- Sidebar -->
     <aside id="sidebar" class="bg-gray-900 w-64 h-full flex flex-col p-4 fixed lg:relative transition-all duration-300 ease-in-out -translate-x-full lg:translate-x-0 z-40">
         <div id="sidebar-content" class="h-full flex flex-col min-w-[224px]">
             <div class="flex items-center justify-between mb-8">
@@ -23,8 +21,7 @@
                 <span class="text-white">New Chat</span>
             </button>
             <div class="flex-grow overflow-y-auto custom-scrollbar">
-                <!-- Chat history can be populated here -->
-            </div>
+                </div>
             <div class="border-t border-gray-700 pt-4 space-y-2">
                 <button id="rate-us-btn" class="w-full flex items-center gap-3 py-2 px-3 rounded-md text-sm hover:bg-gray-700 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
@@ -43,14 +40,12 @@
         </div>
     </aside>
 
-    <!-- Desktop Sidebar Toggle -->
     <div class="hidden lg:flex items-center bg-gray-900 border-l border-gray-800">
         <button id="desktop-sidebar-toggle" class="h-12 px-1 flex items-center justify-center text-gray-400 hover:text-white transition-colors">
             <img id="desktop-sidebar-icon" src="{% static 'images/dock_to_left.png' %}" class="w-5 h-5" alt="Toggle Sidebar">
         </button>
     </div>
 
-    <!-- Main Content -->
     <main class="flex-1 flex flex-col h-screen bg-gray-800">
         <header class="flex-shrink-0 bg-gray-900/50 backdrop-blur-sm p-4 border-b border-gray-700 lg:hidden">
             <button onclick="toggleSidebar()">
@@ -60,7 +55,6 @@
 
         <div id="chat-container" class="flex-1 overflow-y-auto custom-scrollbar">
             <div id="chat-messages" class="max-w-3xl mx-auto p-4 md:p-6 space-y-8">
-                <!-- Welcome Screen -->
                 <div id="welcome-screen" class="text-center py-16">
                     <div class="inline-block bg-gradient-to-r from-green-500 to-green-400 p-4 rounded-full mb-6">
                          <img src="{% static 'images/vinebotLogo.png' %}" alt="vinebotLogo" class="mx-auto w-36 h-32 rounded-full">
@@ -68,11 +62,9 @@
                     <h2 class="text-4xl font-bold text-white mb-2">How can I help you today?</h2>
                     <p class="text-gray-400">Ask me anything, or try one of the suggestions below.</p>
                 </div>
-                 <!-- Chat messages will be appended here -->
-            </div>
+                 </div>
         </div>
 
-        <!-- Prompt Area -->
         <div class="flex-shrink-0 p-4 bg-gray-800">
             <div class="max-w-3xl mx-auto">
                 <div id="suggestions" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
@@ -91,9 +83,22 @@
         </div>
     </main>
 
-    <!-- Rate Us Modal -->
-    <div id="rating-modal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center">
-        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-sm w-full">
+    <div id="rating-modal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center p-4">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-sm w-full relative">
+            <div class="absolute top-4 right-4">
+                <div class="relative">
+                    <button class="three-dot-menu-btn p-2 rounded-full hover:bg-gray-700 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                        </svg>
+                    </button>
+                    <div class="dropdown-menu hidden absolute right-0 mt-2 w-32 bg-gray-700 rounded-md shadow-lg py-1 z-10">
+                        <button class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-600 transition-colors">Rename</button>
+                        <button class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-600 transition-colors">Delete</button>
+                    </div>
+                </div>
+            </div>
+            
             <h3 class="text-2xl font-bold text-white mb-4">Rate Your Experience</h3>
             <div class="flex justify-center space-x-2 mb-6 star-rating">
                 <button data-value="1" class="text-3xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
@@ -102,13 +107,15 @@
                 <button data-value="4" class="text-3xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
                 <button data-value="5" class="text-3xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
             </div>
+            <div class="w-full mb-4">
+                <input type="text" placeholder="Type something..." class="w-full bg-gray-700 text-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
             <div class="flex justify-end gap-4">
                 <button id="close-modal-btn" class="py-2 px-4 rounded-lg bg-gray-600 hover:bg-gray-500 transition-colors">Close</button>
                 <button id="submit-rating-btn" class="py-2 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors">Submit</button>
             </div>
         </div>
     </div>
-
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -130,6 +137,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const ratingModal = document.getElementById('rating-modal');
     const closeModalBtn = document.getElementById('close-modal-btn');
     const starRatingContainer = ratingModal.querySelector('.star-rating');
+    const modalMenuBtn = ratingModal.querySelector('.three-dot-menu-btn');
+    const modalDropdown = ratingModal.querySelector('.dropdown-menu'); // <-- CORRECTED THIS LINE
+    
 
     let currentRating = 0;
     let currentChatId = null;
@@ -168,19 +178,22 @@ document.addEventListener('DOMContentLoaded', () => {
         chatListContainer.innerHTML = "";
         chats.forEach(chat => {
             const chatItem = document.createElement("div");
-            chatItem.className = "group flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer";
+            chatItem.className = "group flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer relative";
             chatItem.dataset.chatId = chat.id;
 
             const titleSpan = document.createElement("span");
             titleSpan.textContent = chat.title;
+            titleSpan.className = "flex-1 truncate";
             chatItem.appendChild(titleSpan);
 
             const menuBtn = document.createElement("button");
-            menuBtn.innerHTML = "⋮";
-            menuBtn.className = "hidden group-hover:inline text-gray-400 hover:text-white ml-2";
+            menuBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            </svg>`;
+            menuBtn.className = "opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white ml-2 p-1 rounded hover:bg-gray-600 transition-all duration-200";
             menuBtn.onclick = (e) => {
                 e.stopPropagation();
-                showChatMenu(chatItem, chat.id, chat.title);
+                showChatMenu(menuBtn, chat.id, chat.title);
             };
             chatItem.appendChild(menuBtn);
 
@@ -247,26 +260,40 @@ document.addEventListener('DOMContentLoaded', () => {
         await fetchChats();
     }
 
-    function showChatMenu(chatItem, chatId, oldTitle) {
+    function showChatMenu(button, chatId, oldTitle) {
+        // Remove any existing menus
+        document.querySelectorAll('.chat-menu-dropdown').forEach(menu => menu.remove());
+        
         const menu = document.createElement("div");
-        menu.className = "absolute bg-gray-800 border border-gray-700 rounded-md shadow-md z-50";
+        menu.className = "chat-menu-dropdown absolute right-0 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-md z-50";
         menu.innerHTML = `
-            <button class="block w-full px-4 py-2 text-left hover:bg-gray-700">Rename</button>
-            <button class="block w-full px-4 py-2 text-left text-red-400 hover:bg-gray-700">Delete</button>
+            <button class="block w-full px-4 py-2 text-left text-sm hover:bg-gray-700 transition-colors">Rename</button>
+            <button class="block w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 transition-colors">Delete</button>
         `;
-        document.body.appendChild(menu);
-
-        const rect = chatItem.getBoundingClientRect();
-        menu.style.top = `${rect.bottom}px`;
-        menu.style.left = `${rect.left}px`;
-
+        
+        // Position relative to button
+        const rect = button.getBoundingClientRect();
+        const parentRect = button.parentElement.getBoundingClientRect();
+        menu.style.width = '120px';
+        
+        // Add menu to button's parent
+        button.parentElement.appendChild(menu);
+        
         const removeMenu = () => {
             menu.remove();
             document.removeEventListener("click", removeMenu);
         };
 
-        menu.children[0].onclick = () => { renameChat(chatId, oldTitle); removeMenu(); };
-        menu.children[1].onclick = () => { deleteChat(chatId); removeMenu(); };
+        menu.children[0].onclick = (e) => { 
+            e.stopPropagation();
+            renameChat(chatId, oldTitle); 
+            removeMenu(); 
+        };
+        menu.children[1].onclick = (e) => { 
+            e.stopPropagation();
+            deleteChat(chatId); 
+            removeMenu(); 
+        };
 
         setTimeout(() => document.addEventListener("click", removeMenu), 0);
     }
@@ -383,6 +410,12 @@ document.addEventListener('DOMContentLoaded', () => {
         ratingModal.style.display = 'none';
     });
 
+    ratingModal.addEventListener('click', (e) => {
+        if (e.target === ratingModal) {
+            ratingModal.style.display = 'none';
+        }
+    });
+
     starRatingContainer.addEventListener('click', (e) => {
         if (e.target.tagName === 'BUTTON') {
             currentRating = parseInt(e.target.dataset.value);
@@ -415,11 +448,81 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Three-dot menu for Rating Modal ---
+    
+    modalMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        modalDropdown.classList.toggle('hidden');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!modalMenuBtn.contains(e.target) && !modalDropdown.contains(e.target)) {
+            modalDropdown.classList.add('hidden');
+        }
+    });
+
+    // Handle modal menu actions (UI only, no backend logic)
+    modalDropdown.querySelectorAll('button').forEach((btn, index) => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (index === 0) {
+                console.log('Rename rating clicked');
+                // Add rename UI logic here
+            } else {
+                console.log('Delete rating clicked');
+                // Add delete UI logic here
+            }
+            modalDropdown.classList.add('hidden');
+        });
+    });
+
     // ================= Init =================
     fetchChats();
 });
 </script>
 
+<style>
+/* Add smooth transitions for hover effects */
+.group:hover .opacity-0 {
+    opacity: 1;
+}
+
+/* Custom scrollbar styles */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Dropdown menu animations */
+.chat-menu-dropdown,
+.dropdown-menu {
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+
 </div>
 {% endblock %}
-
