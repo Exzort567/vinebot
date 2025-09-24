@@ -1,0 +1,1 @@
+web: gunicorn vinebot.wsgi --log-file -

@@ -1,0 +1,37 @@
+# Django framework
+Django==5.2.6
+
+# Gunicorn (for running on Render)
+gunicorn
+
+# Database
+psycopg2-binary==2.9.10
+dj-database-url==3.0.1
+sqlparse==0.5.3
+tzdata==2025.2
+
+# Env vars
+python-dotenv==1.1.1
+django-environ==0.12.0
+
+# Static files
+whitenoise
+
+# Requests & API
+requests==2.32.5
+httpx==0.28.1
+
+# Hugging Face
+huggingface-hub==0.35.0
+gradio_client==1.13.1
+
+# Social Auth (Google login)
+social-auth-app-django==5.5.1
+social-auth-core==4.7.0
+requests-oauthlib==2.0.0
+oauthlib==3.3.1
+
+
+
+django-tailwind==3.8.0
+django-browser-reload==1.15.0 
