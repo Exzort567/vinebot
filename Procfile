@@ -1,1 +1,1 @@
-web: gunicorn vinebot.wsgi --timeout 120 --log-file -
+web: gunicorn vinebot.wsgi --timeout 300 --workers 1 --threads 1
