@@ -5,7 +5,7 @@ from .models import AllowedUser, Chat, Message
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.cache import never_cache
-from django.http import JsonResponse
+from django.http import JsonResponse, StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .chatbot_model_handler import ModelHandler
 import os
@@ -82,7 +82,7 @@ def delete_chat(request, chat_id):
 
 @csrf_exempt
 @login_required
-def chat_api(request):
+def chat_api_stream(request):
     if request.method == "POST":
         body = json.loads(request.body.decode("utf-8"))
         user_message = body.get("message", "")
@@ -90,27 +90,31 @@ def chat_api(request):
 
         if not user_message or not chat_id:
             return JsonResponse({"error": "Message and chat_id is required"}, status=400)
-        
+
         try:
             chat = Chat.objects.get(id=chat_id, user=request.user)
         except Chat.DoesNotExist:
             return JsonResponse({"error": "Chat not found"}, status=404)
-        
+
         # Save user message
         Message.objects.create(chat=chat, sender="user", content=user_message)
-        
+
         if chat.title == "New Chat":
             title = user_message[:25] + ("..." if len(user_message) > 25 else "")
             chat.title = title
             chat.save()
 
-        # Generate bot response
-        bot_reply = model_handler.generate_response(user_message)
+        def event_stream():
+            try:
+                for chunk in model_handler.stream_response(user_message):
+                    yield f"data: {chunk}\n\n"
+            except Exception as e:
+                yield f"data: Error: {str(e)}\n\n"
 
-        # Save bot response
-        Message.objects.create(chat=chat, sender="bot", content=bot_reply)
+        response = StreamingHttpResponse(event_stream(), content_type="text/event-stream")
+        response["Cache-Control"] = "no-cache"
+        return response
 
-        return JsonResponse({"reply": bot_reply})
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
 def login_page(request):

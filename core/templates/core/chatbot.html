@@ -319,20 +319,57 @@ document.addEventListener('DOMContentLoaded', () => {
         sendBtn.disabled = true;
 
         try {
-            const response = await fetch("{% url 'chat_api' %}", {
+            const response = await fetch("{% url 'chat_api_stream' %}", {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: message, chat_id: currentChatId })
             });
-            const data = await response.json();
-            if (data.reply) {
-                appendMessage('bot', data.reply);
-            } else {
-                appendMessage('bot', "Sorry, I couldn't generate a response");
+
+            if (!response.ok) {
+                appendMessage('bot', "Error: failed to connect to streaming API");
+                return;
             }
+
+            // ✅ Create bot message container early
+            const botWrapper = document.createElement('div');
+            botWrapper.className = "flex items-start gap-4";
+            const botAvatar = document.createElement('img');
+            botAvatar.className = 'w-10 h-10 rounded-full flex-shrink-0';
+            botAvatar.src = "{% static 'images/vinebotLogo.png' %}";
+            const botBubble = document.createElement('div');
+            botBubble.className = "max-w-xl p-4 rounded-2xl bg-gray-700 text-gray-200 rounded-bl-none";
+            botWrapper.appendChild(botAvatar);
+            botWrapper.appendChild(botBubble);
+            chatMessages.appendChild(botWrapper);
+            chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
+
+            // ✅ Now read the response stream
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let botText = "";
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                const chunk = decoder.decode(value, { stream: true });
+
+                // SSE sends in "data: ..." format
+                chunk.split("\n").forEach(line => {
+                    if (line.startsWith("data: ")) {
+                        const text = line.replace("data: ", "").trim();
+                        if (text && text !== "[DONE]") {
+                            botText += text;
+                            botBubble.textContent = botText;
+                            chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
+                        }
+                    }
+                });
+            }
+
         } catch (error) {
             appendMessage('bot', "Error:" + error.message);
         }
+
         await fetchChats();
     });
 
