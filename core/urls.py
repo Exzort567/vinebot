@@ -18,6 +18,9 @@ urlpatterns = [
     path("chat/<int:chat_id>/rename/", views.rename_chat, name="chat_rename"),
     path("chat/<int:chat_id>/delete/", views.delete_chat, name="chat_delete"),
 
+    path("chat/rating/submit/", views.submit_rating, name="submit_rating"),
+
+
     # Chatbot APIs
     path("chat-api/", views.chat_api_stream, name="chat_api"),
     path("chat-api/stream/", views.chat_api_stream, name="chat_api_stream"),  # ✅ Add this

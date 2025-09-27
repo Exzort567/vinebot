@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout as auth_logout
-from .models import AllowedUser, Chat, Message
+from .models import AllowedUser, Chat, Message, Rating
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.cache import never_cache
@@ -16,6 +16,31 @@ load_dotenv()
 
 SPACE_NAME = os.getenv("SPACE_NAME")
 model_handler = ModelHandler(SPACE_NAME)
+
+# Rating
+@login_required
+@csrf_exempt
+@require_http_methods(["POST"])
+def submit_rating(request):
+    try:
+        body = json.loads(request.body.decode("utf-8"))
+        stars = int(body.get("stars", 0))
+        feedback = body.get("feedback", "")
+
+        if stars < 1 or stars > 5:
+            return JsonResponse({"error": "Invalid star rating"}, status=400)
+        
+        rating = Rating.objects.create(
+            user=request.user,
+            stars=stars,
+            feedback=feedback
+        )
+
+        return JsonResponse({"success": True, "rating_id": rating.id})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
+
 
 # Create new chat
 @login_required

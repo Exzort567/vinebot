@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
-from core.models import AllowedUser
+from core.models import AllowedUser, Rating
 from .forms import AllowedUserForm
+
 
 @login_required(login_url='/')
 @never_cache
@@ -15,8 +16,14 @@ def dashboard(request):
         return redirect('denied')
 
     users = AllowedUser.objects.all()
+    ratings = Rating.objects.select_related("user").order_by("-created_at")
     form = AllowedUserForm()
-    return render(request, 'admin_dashboard/dashboard.html', {"users": users, "form": form})
+
+    return render(request, 'admin_dashboard/dashboard.html', {
+        "users": users,
+        "ratings": ratings,
+        "form": form,
+    })
 
 
 @login_required(login_url='/')

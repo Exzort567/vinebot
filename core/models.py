@@ -18,6 +18,15 @@ class Message(models.Model):
 
     def __str__(self):
         return f"{self.sender}: {self.content[:30]}"
+    
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ratings")
+    stars = models.IntegerField()
+    feedback = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.stars} Stars"
 
 class AllowedUser(models.Model):
     ROLE_CHOICES = [

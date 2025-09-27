@@ -467,17 +467,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    starRatingContainer.addEventListener('mouseover', (e) => {
-        if (e.target.tagName === 'BUTTON') {
-            const hoverValue = parseInt(e.target.dataset.value);
-            updateStars(hoverValue, true);
-        }
-    });
-
-    starRatingContainer.addEventListener('mouseout', () => {
-        updateStars();
-    });
-
     function updateStars(hoverValue = 0, isHovering = false) {
         const stars = starRatingContainer.querySelectorAll('button');
         const displayValue = isHovering ? hoverValue : currentRating;
@@ -491,6 +480,59 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // ✅ Add your submit rating code here
+    const submitRatingBtn = document.getElementById('submit-rating-btn');
+
+    submitRatingBtn.addEventListener('click', async () => {
+        const feedbackInput = ratingModal.querySelector('input[type="text"]');
+        const feedback = feedbackInput.value.trim();
+
+        if (currentRating === 0) {
+            alert("Please select a star rating first.");
+            return;
+        }
+
+        const res = await fetch("/chat/rating/submit/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken")   // ✅ now defined
+            },
+            body: JSON.stringify({
+                stars: currentRating,
+                feedback: feedback
+            })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            alert("Thank you for your feedback!");
+            ratingModal.style.display = "none";
+            feedbackInput.value = "";
+            currentRating = 0;
+            updateStars();
+        } else {
+            alert("Error: " + data.error);
+        }
+    });
+
+    // --- Helper: Get CSRF token ---
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+}
+
 
     // --- Three-dot menu for Rating Modal ---
     
