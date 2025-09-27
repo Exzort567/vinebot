@@ -260,43 +260,50 @@ document.addEventListener('DOMContentLoaded', () => {
         await fetchChats();
     }
 
-    function showChatMenu(button, chatId, oldTitle) {
-        // Remove any existing menus
-        document.querySelectorAll('.chat-menu-dropdown').forEach(menu => menu.remove());
-        
-        const menu = document.createElement("div");
-        menu.className = "chat-menu-dropdown absolute right-0 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-md z-50";
-        menu.innerHTML = `
-            <button class="block w-full px-4 py-2 text-left text-sm hover:bg-gray-700 transition-colors">Rename</button>
-            <button class="block w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 transition-colors">Delete</button>
-        `;
-        
-        // Position relative to button
-        const rect = button.getBoundingClientRect();
-        const parentRect = button.parentElement.getBoundingClientRect();
-        menu.style.width = '120px';
-        
-        // Add menu to button's parent
-        button.parentElement.appendChild(menu);
-        
-        const removeMenu = () => {
-            menu.remove();
-            document.removeEventListener("click", removeMenu);
+    function showChatMenu(button, chatId, chatTitle) {
+        // Create dropdown menu dynamically
+        const dropdown = document.createElement("div");
+        dropdown.className = "absolute right-0 mt-2 w-32 bg-gray-700 rounded-md shadow-lg py-1 z-20";
+
+        // Rename button
+        const renameBtn = document.createElement("button");
+        renameBtn.textContent = "Rename";
+        renameBtn.className = "block w-full text-left px-4 py-2 text-sm hover:bg-gray-600 transition-colors";
+        renameBtn.onclick = async (e) => {
+            e.stopPropagation();
+            dropdown.remove();
+            await renameChat(chatId, chatTitle);
         };
 
-        menu.children[0].onclick = (e) => { 
+        // Delete button
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.className = "block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-600 transition-colors";
+        deleteBtn.onclick = async (e) => {
             e.stopPropagation();
-            renameChat(chatId, oldTitle); 
-            removeMenu(); 
-        };
-        menu.children[1].onclick = (e) => { 
-            e.stopPropagation();
-            deleteChat(chatId); 
-            removeMenu(); 
+            dropdown.remove();
+            await deleteChat(chatId);
         };
 
-        setTimeout(() => document.addEventListener("click", removeMenu), 0);
+        dropdown.appendChild(renameBtn);
+        dropdown.appendChild(deleteBtn);
+
+        // Remove any existing dropdown first
+        document.querySelectorAll(".chat-dropdown").forEach(el => el.remove());
+        dropdown.classList.add("chat-dropdown");
+        button.parentElement.appendChild(dropdown);
+
+        // ✅ Close dropdown when clicking outside (delay binding to avoid instant close)
+        setTimeout(() => {
+            document.addEventListener("click", (e) => {
+                if (!button.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.remove();
+                }
+            }, { once: true });
+        }, 0);
     }
+
+
 
     // ================= Sending Messages =================
     chatForm.addEventListener('submit', async (e) => {
