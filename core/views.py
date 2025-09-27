@@ -96,7 +96,7 @@ def chat_api_stream(request):
         except Chat.DoesNotExist:
             return JsonResponse({"error": "Chat not found"}, status=404)
 
-        # Save user message
+        # Save user message immediately
         Message.objects.create(chat=chat, sender="user", content=user_message)
 
         if chat.title == "New Chat":
@@ -105,17 +105,24 @@ def chat_api_stream(request):
             chat.save()
 
         def event_stream():
+            bot_response = ""  # collect full reply
             try:
                 for chunk in model_handler.stream_response(user_message):
+                    bot_response += chunk
                     yield f"data: {chunk}\n\n"
             except Exception as e:
                 yield f"data: Error: {str(e)}\n\n"
+            finally:
+                if bot_response.strip():
+                    # ✅ Save full bot reply to DB
+                    Message.objects.create(chat=chat, sender="bot", content=bot_response)
 
         response = StreamingHttpResponse(event_stream(), content_type="text/event-stream")
         response["Cache-Control"] = "no-cache"
         return response
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
 
 def login_page(request):
     return render(request, 'core/login.html')
