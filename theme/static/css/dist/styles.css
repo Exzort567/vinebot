@@ -532,6 +532,9 @@
     opacity: 0%;
     scale: 95%;
   }
+  .visible {
+    visibility: visible;
+  }
   .list {
     display: flex;
     flex-direction: column;

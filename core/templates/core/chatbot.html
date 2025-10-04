@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ================= Sending Messages =================
-    // REPLACE your entire 'chatForm.addEventListener' with this corrected version
+  
     chatForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const message = chatInput.value.trim();
@@ -348,14 +348,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const botWrapper = document.createElement('div');
-            botWrapper.className = "flex items-start gap-4";
+            // ✨ New: Add the base animation class
+            botWrapper.className = "flex items-start gap-4 bot-message-entry"; 
             
             const botAvatar = document.createElement('img');
             botAvatar.className = 'w-10 h-10 rounded-full flex-shrink-0';
             botAvatar.src = "{% static 'images/vinebotLogo.png' %}";
             
             const botBubble = document.createElement('div');
-            botBubble.className = "max-w-xl p-4 rounded-2xl bg-gray-700 text-gray-200 rounded-bl-none";
+            botBubble.className = "max-w-xl p-4 rounded-2xl bg-gray-700 text-gray-200 rounded-bl-none chatbot-typing-bubble";
+
             
             const botTextSpan = document.createElement('span');
             const typingCursor = document.createElement('span');
@@ -366,6 +368,13 @@ document.addEventListener('DOMContentLoaded', () => {
             botWrapper.appendChild(botAvatar);
             botWrapper.appendChild(botBubble);
             chatMessages.appendChild(botWrapper);
+
+            // ✨ New: Trigger the animation after a tiny delay
+            // This ensures the browser renders the element before starting the transition.
+            requestAnimationFrame(() => {
+                botWrapper.classList.add('visible');
+            });
+            
             chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
 
             const reader = response.body.getReader();
@@ -376,11 +385,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const { value, done } = await reader.read();
                 if (done) {
                     typingCursor.remove();
-                    // ✅ Apply formatting once at the end
                     botTextSpan.innerHTML = formatBotResponse(botText);
+                    // Animation ends
+                    botBubble.classList.remove('chatbot-typing-bubble');
                     break;
                 }
-
                 const chunk = decoder.decode(value, { stream: true });
 
                 chunk.split("\n").forEach(line => {
@@ -389,14 +398,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         if (text && text !== "[DONE]") {
                             botText += text;
-                            // ⏳ During streaming → raw text only
-                            botTextSpan.textContent = botText;
+                            botTextSpan.innerHTML = formatBotResponse(botText);
                             chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
                         }
                     }
                 });
             }
-
         } catch (error) {
             appendMessage('bot', "Error:" + error.message);
         }
@@ -593,7 +600,43 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <style>
-    /* Add this to your <style> block */
+.bot-message-entry {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+.bot-message-entry.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+@keyframes chatbotTypeIn {
+    0% {
+        opacity: 0;
+        transform: translate(18px) scale(0.95);
+    }
+    70% {
+        opacity: 1;
+        transform: translate(-2px) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(0) scale(1);
+    }
+
+}
+.chatbot-typing-bubble {
+    animation: chatbotTypeIn 0.45s cubic-bezier(.64,.31,.66,1.48);
+    background: linear-gradient(90deg, #364153 10%, #404855 90%);
+    background-size: 200% 100%;
+    animation: chatbotTypeIn 0.45s cubic-bezier(.64,.31,.66,1.48), pulseGradient 1.4s infinite linear;
+}
+
+@keyframes pulseGradient {
+    0% { background-position: 0 0;}
+    100% { background-position: 100 0;}
+}
+
 .typing-indicator {
     display: inline-block;
     width: 2px;
@@ -636,6 +679,7 @@ document.addEventListener('DOMContentLoaded', () => {
 .dropdown-menu {
     animation: fadeIn 0.2s ease-out;
 }
+
 
 @keyframes fadeIn {
     from {
