@@ -30,14 +30,12 @@ class ModelHandler:
         print(f"[DEBUG] Streaming from HF Space: {user_input}")
         try:
             job = self.client.submit(user_input, api_name="/predict")
-            full_response = ""
             for event in job:
                 if event is None:
                     continue
                 print(f"[DEBUG] Raw event from HF: {event!r}")
-                full_response += str(event)
-
-            return full_response   # ✅ return final assembled answer
+                yield str(event)   # ✅ yield chunk immediately
         except Exception as e:
             print(f"[DEBUG] Exception in stream_response: {str(e)}")
-            return f"Error: {str(e)}"
+            yield f"Error: {str(e)}"
+

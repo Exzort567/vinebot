@@ -83,38 +83,7 @@
         </div>
     </main>
 
-    <div id="rating-modal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center p-4">
-        <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-sm w-full relative">
-            <div class="absolute top-4 right-4">
-                <div class="relative">
-                    <button class="three-dot-menu-btn p-2 rounded-full hover:bg-gray-700 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                        </svg>
-                    </button>
-                    <div class="dropdown-menu hidden absolute right-0 mt-2 w-32 bg-gray-700 rounded-md shadow-lg py-1 z-10">
-                        <button class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-600 transition-colors">Rename</button>
-                        <button class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-600 transition-colors">Delete</button>
-                    </div>
-                </div>
-            </div>
-            
-            <h3 class="text-2xl font-bold text-white mb-4">Rate Your Experience</h3>
-            <div class="flex justify-center space-x-2 mb-6 star-rating">
-                <button data-value="1" class="text-3xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
-                <button data-value="2" class="text-3xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
-                <button data-value="3" class="text-3xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
-                <button data-value="4" class="text-3xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
-                <button data-value="5" class="text-3xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
-            </div>
-            <div class="w-full mb-4">
-                <input type="text" placeholder="Type something..." class="w-full bg-gray-700 text-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
-            </div>
-            <div class="flex justify-end gap-4">
-                <button id="close-modal-btn" class="py-2 px-4 rounded-lg bg-gray-600 hover:bg-gray-500 transition-colors">Close</button>
-                <button id="submit-rating-btn" class="py-2 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors">Submit</button>
-            </div>
-        </div>
+
     </div>
 
 <script>
@@ -145,168 +114,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentChatId = null;
     const chatListContainer = sidebar.querySelector('.flex-grow');
 
-    // ================= Sidebar Toggle =================
-    window.toggleSidebar = () => {
-        sidebar.classList.toggle('-translate-x-full');
-        sidebarOverlay.classList.toggle('hidden');
-    };
-
-    desktopSidebarToggle.addEventListener('click', () => {
-        const isCollapsed = sidebar.classList.contains('w-0');
-        if (isCollapsed) {
-            sidebar.classList.remove('w-0', 'p-0');
-            sidebar.classList.add('w-64', 'p-4');
-            sidebarContent.classList.remove('hidden');
-            desktopSidebarIcon.src = dockLeftUrl;
-        } else {
-            sidebar.classList.remove('w-64', 'p-4');
-            sidebar.classList.add('w-0', 'p-0');
-            sidebarContent.classList.add('hidden');
-            desktopSidebarIcon.src = dockRightUrl;
-        }
-    });
-
-    // ================= Chat Handling =================
-    async function fetchChats() {
-        const res = await fetch("/chat/history/");
-        if (!res.ok) return;
-        const data = await res.json();
-        renderChatList(data.chats);
-    }
-
-    function renderChatList(chats) {
-        chatListContainer.innerHTML = "";
-        chats.forEach(chat => {
-            const chatItem = document.createElement("div");
-            chatItem.className = "group flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer relative";
-            chatItem.dataset.chatId = chat.id;
-
-            const titleSpan = document.createElement("span");
-            titleSpan.textContent = chat.title;
-            titleSpan.className = "flex-1 truncate";
-            chatItem.appendChild(titleSpan);
-
-            const menuBtn = document.createElement("button");
-            menuBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-            </svg>`;
-            menuBtn.className = "opacity-0 group-hover:opacity-100 text-gray-400 hover:text-white ml-2 p-1 rounded hover:bg-gray-600 transition-all duration-200";
-            menuBtn.onclick = (e) => {
-                e.stopPropagation();
-                showChatMenu(menuBtn, chat.id, chat.title);
-            };
-            chatItem.appendChild(menuBtn);
-
-            chatItem.addEventListener("click", () => loadChat(chat.id));
-            chatListContainer.appendChild(chatItem);
-        });
-    }
-
-    async function createChat() {
-        const res = await fetch("/chat/new/", { method: "POST" });
-        if (!res.ok) return;
-        const data = await res.json();
-        currentChatId = data.chat_id;
-        await fetchChats();
-
-        chatMessages.innerHTML = "";
-        chatMessages.appendChild(welcomeScreen);
-        welcomeScreen.style.display = "block";
-        suggestionsContainer.style.display = "grid";
-        if (window.innerWidth < 1024) toggleSidebar();
-    }
-
-    async function loadChat(chatId) {
-        currentChatId = chatId;
-        const res = await fetch(`/chat/${chatId}/messages/`);
-        if (!res.ok) return;
-        const data = await res.json();
-
-        chatMessages.innerHTML = "";
-        if (data.length === 0) {
-            chatMessages.appendChild(welcomeScreen);
-            welcomeScreen.style.display = "block";
-            suggestionsContainer.style.display = "grid";
-        } else {
-            welcomeScreen.style.display = "none";
-            suggestionsContainer.style.display = "none";
-            data.forEach(msg => {
-                appendMessage(msg.sender, msg.content);
-            });
-        }
-    }
-
-    async function renameChat(chatId, oldTitle) {
-        const newTitle = prompt("Enter new chat title:", oldTitle);
-        if (!newTitle) return;
-        await fetch(`/chat/${chatId}/rename/`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({title: newTitle})
-        });
-        await fetchChats();
-    }
-
-    async function deleteChat(chatId) {
-        if (!confirm("Delete this chat?")) return;
-        await fetch(`/chat/${chatId}/delete/`, { method: "POST" });
-        if (chatId === currentChatId) {
-            currentChatId = null;
-            chatMessages.innerHTML = "";
-            chatMessages.appendChild(welcomeScreen);
-            welcomeScreen.style.display = "block";
-            suggestionsContainer.style.display = "grid";
-        }
-        await fetchChats();
-    }
-
-    function showChatMenu(button, chatId, chatTitle) {
-        // Create dropdown menu dynamically
-        const dropdown = document.createElement("div");
-        dropdown.className = "absolute right-0 mt-2 w-32 bg-gray-700 rounded-md shadow-lg py-1 z-20";
-
-        // Rename button
-        const renameBtn = document.createElement("button");
-        renameBtn.textContent = "Rename";
-        renameBtn.className = "block w-full text-left px-4 py-2 text-sm hover:bg-gray-600 transition-colors";
-        renameBtn.onclick = async (e) => {
-            e.stopPropagation();
-            dropdown.remove();
-            await renameChat(chatId, chatTitle);
-        };
-
-        // Delete button
-        const deleteBtn = document.createElement("button");
-        deleteBtn.textContent = "Delete";
-        deleteBtn.className = "block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-600 transition-colors";
-        deleteBtn.onclick = async (e) => {
-            e.stopPropagation();
-            dropdown.remove();
-            await deleteChat(chatId);
-        };
-
-        dropdown.appendChild(renameBtn);
-        dropdown.appendChild(deleteBtn);
-
-        // Remove any existing dropdown first
-        document.querySelectorAll(".chat-dropdown").forEach(el => el.remove());
-        dropdown.classList.add("chat-dropdown");
-        button.parentElement.appendChild(dropdown);
-
-        // ✅ Close dropdown when clicking outside (delay binding to avoid instant close)
-        setTimeout(() => {
-            document.addEventListener("click", (e) => {
-                if (!button.contains(e.target) && !dropdown.contains(e.target)) {
-                    dropdown.remove();
-                }
-            }, { once: true });
-        }, 0);
-    }
-
 
 
     // ================= Sending Messages =================
-    // REPLACE your entire 'chatForm.addEventListener' with this corrected version
+    // REPLACE your entire 'chatForm.addEventListener' with this new version
     chatForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const message = chatInput.value.trim();
@@ -321,18 +132,23 @@ document.addEventListener('DOMContentLoaded', () => {
             suggestionsContainer.style.display = 'none';
         }
 
-        appendMessage('user', message);
+        appendMessage('user', message); // This function is still used for user messages
         chatInput.value = '';
         chatInput.style.height = 'auto';
         sendBtn.disabled = true;
 
+        // ✨ Change: Create a dedicated formatting function
+        // This function intelligently adds line breaks and bolding for a clean look.
         function formatBotResponse(text) {
+            // Sanitize to prevent basic HTML injection
             let safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+            // Use regex to format the Q&A structure and numbered lists
             return safeText
                 .replace(/\bQ: /g, '<br><br><strong>Q:</strong> ')
                 .replace(/\bA: /g, '<br><strong>A:</strong> ')
                 .replace(/\((\d+)\)/g, '<br>($1)')
-                .replace(/^<br><br>/, '');
+                .replace(/^<br><br>/, ''); // Remove leading breaks
         }
 
         try {
@@ -347,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // ✨ Change: Create bot message elements with placeholders for text and a cursor
             const botWrapper = document.createElement('div');
             botWrapper.className = "flex items-start gap-4";
             
@@ -357,8 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const botBubble = document.createElement('div');
             botBubble.className = "max-w-xl p-4 rounded-2xl bg-gray-700 text-gray-200 rounded-bl-none";
             
-            const botTextSpan = document.createElement('span');
-            const typingCursor = document.createElement('span');
+            const botTextSpan = document.createElement('span'); // To hold the formatted text
+            const typingCursor = document.createElement('span'); // The blinking cursor
             typingCursor.className = 'typing-indicator';
             
             botBubble.appendChild(botTextSpan);
@@ -368,6 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
             chatMessages.appendChild(botWrapper);
             chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
 
+            // ✨ Change: Read the stream and update the botTextSpan using innerHTML
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let botText = "";
@@ -375,28 +193,23 @@ document.addEventListener('DOMContentLoaded', () => {
             while (true) {
                 const { value, done } = await reader.read();
                 if (done) {
-                    typingCursor.remove();
-                    // ✅ Apply formatting once at the end
-                    botTextSpan.innerHTML = formatBotResponse(botText);
+                    typingCursor.remove(); // ✨ Change: Remove cursor when finished
                     break;
                 }
-
                 const chunk = decoder.decode(value, { stream: true });
 
                 chunk.split("\n").forEach(line => {
                     if (line.startsWith("data: ")) {
-                        const text = line.replace("data: ", "");
-
+                        const text = line.replace("data: ", "").trim();
                         if (text && text !== "[DONE]") {
                             botText += text;
-                            // ⏳ During streaming → raw text only
-                            botTextSpan.textContent = botText;
+                            // ✨ Change: Use the formatter and innerHTML
+                            botTextSpan.innerHTML = formatBotResponse(botText); 
                             chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
                         }
                     }
                 });
             }
-
         } catch (error) {
             appendMessage('bot', "Error:" + error.message);
         }
@@ -449,143 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- New Chat Button ---
-    newChatBtn.addEventListener('click', () => {
-        currentChatId = null;
-        chatMessages.innerHTML = '';
-        chatMessages.appendChild(welcomeScreen);
-        welcomeScreen.style.display = 'block';
-        suggestionsContainer.style.display = 'grid';
-        if (window.innerWidth < 1024) toggleSidebar();
-    });
-
-    // --- Suggestion Cards ---
-    suggestionsContainer.addEventListener('click', (e) => {
-        const card = e.target.closest('.suggestion-card');
-        if (card) {
-            const prompt = card.querySelector('p').textContent;
-            chatInput.value = prompt;
-            chatForm.dispatchEvent(new Event('submit'));
-        }
-    });
-
-    // --- Rating Modal Logic ---
-    rateUsBtn.addEventListener('click', () => {
-        ratingModal.style.display = 'flex';
-    });
-
-    closeModalBtn.addEventListener('click', () => {
-        ratingModal.style.display = 'none';
-    });
-
-    ratingModal.addEventListener('click', (e) => {
-        if (e.target === ratingModal) {
-            ratingModal.style.display = 'none';
-        }
-    });
-
-    starRatingContainer.addEventListener('click', (e) => {
-        if (e.target.tagName === 'BUTTON') {
-            currentRating = parseInt(e.target.dataset.value);
-            updateStars();
-        }
-    });
-
-    function updateStars(hoverValue = 0, isHovering = false) {
-        const stars = starRatingContainer.querySelectorAll('button');
-        const displayValue = isHovering ? hoverValue : currentRating;
-        stars.forEach(star => {
-            if (parseInt(star.dataset.value) <= displayValue) {
-                star.classList.remove('text-gray-500');
-                star.classList.add('text-yellow-400');
-            } else {
-                star.classList.add('text-gray-500');
-                star.classList.remove('text-yellow-400');
-            }
-        });
-    }
-
-    // ✅ Add your submit rating code here
-    const submitRatingBtn = document.getElementById('submit-rating-btn');
-
-    submitRatingBtn.addEventListener('click', async () => {
-        const feedbackInput = ratingModal.querySelector('input[type="text"]');
-        const feedback = feedbackInput.value.trim();
-
-        if (currentRating === 0) {
-            alert("Please select a star rating first.");
-            return;
-        }
-
-        const res = await fetch("/chat/rating/submit/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": getCookie("csrftoken")   // ✅ now defined
-            },
-            body: JSON.stringify({
-                stars: currentRating,
-                feedback: feedback
-            })
-        });
-
-        const data = await res.json();
-        if (data.success) {
-            alert("Thank you for your feedback!");
-            ratingModal.style.display = "none";
-            feedbackInput.value = "";
-            currentRating = 0;
-            updateStars();
-        } else {
-            alert("Error: " + data.error);
-        }
-    });
-
-    // --- Helper: Get CSRF token ---
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-}
-
-
-    // --- Three-dot menu for Rating Modal ---
-    
-    modalMenuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        modalDropdown.classList.toggle('hidden');
-    });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!modalMenuBtn.contains(e.target) && !modalDropdown.contains(e.target)) {
-            modalDropdown.classList.add('hidden');
-        }
-    });
-
-    // Handle modal menu actions (UI only, no backend logic)
-    modalDropdown.querySelectorAll('button').forEach((btn, index) => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (index === 0) {
-                console.log('Rename rating clicked');
-                // Add rename UI logic here
-            } else {
-                console.log('Delete rating clicked');
-                // Add delete UI logic here
-            }
-            modalDropdown.classList.add('hidden');
-        });
-    });
+  
 
     // ================= Init =================
     fetchChats();

@@ -130,18 +130,17 @@ def chat_api_stream(request):
             chat.save()
 
         def event_stream():
+            bot_response = ""
             try:
-                # ✅ Get the full assembled reply from model handler
-                bot_response = model_handler.stream_response(user_message)
-
-                # Send it in one go to frontend
-                yield f"data: {bot_response}\n\n"
-
-                # Save full reply in DB
-                if bot_response.strip():
-                    Message.objects.create(chat=chat, sender="bot", content=bot_response)
+                for chunk in model_handler.stream_response(user_message):
+                    bot_response += chunk
+                    yield f"data: {chunk}\n\n"   # ✅ push each piece to browser
             except Exception as e:
                 yield f"data: Error: {str(e)}\n\n"
+            finally:
+                if bot_response.strip():
+                    Message.objects.create(chat=chat, sender="bot", content=bot_response)
+
 
         response = StreamingHttpResponse(event_stream(), content_type="text/event-stream")
         response["Cache-Control"] = "no-cache"
