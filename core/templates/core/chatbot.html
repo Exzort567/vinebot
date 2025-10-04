@@ -385,8 +385,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const { value, done } = await reader.read();
                 if (done) {
                     typingCursor.remove();
-                    botTextSpan.innerHTML = formatBotResponse(botText);
-                    // Animation ends
+                    // Final formatting and display
+                    botTextSpan.innerHTML = formatBotResponse(botText.trim()); // trim() removes any trailing space
                     botBubble.classList.remove('chatbot-typing-bubble');
                     break;
                 }
@@ -397,10 +397,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         const text = line.replace("data: ", "");
 
                         if (text && text !== "[DONE]") {
-                            botText += text;
-                            botTextSpan.innerHTML = formatBotResponse(botText);
-                            chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
+                        // Add a space unless punctuation
+                        if (!text.startsWith(" ") && !/^[.,!?;:]/.test(text)) {
+                            botText += " ";
                         }
+                        botText += text;
+
+                        botTextSpan.textContent = botText.trim();
+                        chatMessages.parentElement.scrollTop = chatMessages.parentElement.scrollHeight;
+                    }
                     }
                 });
             }
