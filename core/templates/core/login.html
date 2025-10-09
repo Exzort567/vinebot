@@ -3,35 +3,98 @@
 {% block title %}Login - VineBot{% endblock %}
 {% block content %}
 
-<div class="h-screen w-full flex items-center justify-center bg-cover bg-center"
-     style="background-image: url('{% static "images/vinebotBG.png" %}');">
+<style>
+  /* --- FONT DEFINITION --- */
+  .font-lekton {
+    font-family: 'Lekton', sans-serif;
+  }
 
-  <!-- Card -->
-  <div class="bg-black bg-opacity-25 rounded-2xl shadow-xl p-8 w-96 text-center">
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
 
-    
-    <!-- Logo -->
+  #vinebot-title span, #verse {
+    opacity: 0;
+  }
+  
+  #login-card {
+    opacity: 0;
+    animation: fadeIn 0.7s ease-out 0.8s forwards; /* Added delay directly */
+  }
+
+  .animate-title span {
+    display: inline-block;
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
+  .animate-verse {
+    animation: fadeIn 0.7s ease-out forwards;
+  }
+
+  .animate-title span:nth-child(1) { animation-delay: 0.1s; }
+  .animate-title span:nth-child(2) { animation-delay: 0.2s; }
+  .animate-title span:nth-child(3) { animation-delay: 0.3s; }
+  .animate-title span:nth-child(4) { animation-delay: 0.4s; }
+  .animate-title span:nth-child(5) { animation-delay: 0.5s; }
+  .animate-title span:nth-child(6) { animation-delay: 0.6s; }
+  .animate-title span:nth-child(7) { animation-delay: 0.7s; }
+</style>
+
+<div class="h-screen w-full flex flex-col items-center justify-center p-4 bg-cover bg-center"
+     style="background-image: url('{% static "images/Revised.png" %}');">
+
+  <h1 id="vinebot-title" class="font-lekton text-6xl sm:text-7xl text-[#00FF44] font-normal mb-8 tracking-[0.2em]">
+    <span>V</span><span>i</span><span>n</span><span>e</span><span>b</span><span>o</span><span>t</span>
+  </h1>
+
+  <div id="login-card" class="bg-black/20 backdrop-blur-sm rounded-2xl shadow-xl p-8 w-full max-w-sm text-center">
     <div class="bg-white rounded-2xl p-2 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
       <img src="{% static 'images/vinebotLogo.png' %}" alt="Logo" class="w-20 h-16 object-contain">
     </div>
-
-    <!-- Welcome -->
-    <h2 class="text-white text-xl font-semibold mb-6">Welcome back</h2>
-
-    <!-- Google Login -->
-    <a href="{% url 'social:begin' 'google-oauth2' %}" 
-       class="flex items-center justify-center gap-2 w-full py-3 mb-6 bg-gray-900 rounded-lg shadow hover:bg-gray-700 transition">
+    <a href="{% url 'social:begin' 'google-oauth2' %}"
+       class="flex items-center justify-center gap-2 w-full py-3 mb-6 bg-[#6293702d] rounded-lg shadow hover:bg-[#6293704d] transition-colors duration-300">
       <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google" class="w-5 h-5">
       <span class="text-white font-medium">Login with Google</span>
     </a>
-
-    <!-- Signup -->
     <p class="text-gray-200 text-sm">
-      Don’t have an account? 
-      <a href="{% url 'social:begin' 'google-oauth2' %}" class="text-green-400 hover:underline">Sign up</a>
+      Don’t have an account?
+      <a href="{% url 'social:begin' 'google-oauth2' %}" class="text-green-400 font-semibold hover:underline">Sign up</a>
     </p>
   </div>
+
+  <p id="verse" class="font-lekton text-[#00FF44] font-normal text-center mt-8 max-w-2xl px-4">
+    Ephesians 4:12 - “To equip his people for works of service, so that
+the body of Christ may be built up.”
+  </p>
 </div>
+
+<script>
+  // Wait for the page content to be fully loaded before running the script
+  document.addEventListener('DOMContentLoaded', () => {
+    const vinebotTitle = document.getElementById('vinebot-title');
+    const verse = document.getElementById('verse');
+    
+    // This function resets and then triggers the animations
+    function playAnimations() {
+      vinebotTitle.classList.remove('animate-title');
+      verse.classList.remove('animate-verse');
+
+      void vinebotTitle.offsetWidth;
+      void verse.offsetWidth;
+
+      vinebotTitle.classList.add('animate-title');
+      verse.classList.add('animate-verse');
+    }
+
+    playAnimations();
+
+    setInterval(playAnimations, 15000);
+  });
+</script>
 
 {% endblock %}
