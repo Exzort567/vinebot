@@ -17,7 +17,6 @@
     --color-yellow-300: oklch(90.5% 0.182 98.111);
     --color-yellow-400: oklch(85.2% 0.199 91.936);
     --color-green-200: oklch(92.5% 0.084 155.995);
-    --color-green-300: oklch(87.1% 0.15 154.449);
     --color-green-400: oklch(79.2% 0.209 151.711);
     --color-green-500: oklch(72.3% 0.219 149.579);
     --color-green-600: oklch(62.7% 0.194 149.214);
@@ -29,9 +28,7 @@
     --color-blue-600: oklch(54.6% 0.245 262.881);
     --color-blue-700: oklch(48.8% 0.243 264.376);
     --color-indigo-500: oklch(58.5% 0.233 277.117);
-    --color-purple-400: oklch(71.4% 0.203 305.504);
     --color-purple-500: oklch(62.7% 0.265 303.9);
-    --color-purple-800: oklch(43.8% 0.218 303.724);
     --color-gray-50: oklch(98.5% 0.002 247.839);
     --color-gray-100: oklch(96.7% 0.003 264.542);
     --color-gray-200: oklch(92.8% 0.006 264.531);
@@ -70,12 +67,10 @@
     --text-6xl--line-height: 1;
     --text-7xl: 4.5rem;
     --text-7xl--line-height: 1;
-    --font-weight-light: 300;
     --font-weight-normal: 400;
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
-    --font-weight-extrabold: 800;
     --tracking-normal: 0em;
     --tracking-wider: 0.05em;
     --leading-tight: 1.25;
@@ -244,49 +239,6 @@
   }
 }
 @layer utilities {
-  .modal {
-    pointer-events: none;
-    visibility: hidden;
-    position: fixed;
-    inset: calc(0.25rem * 0);
-    margin: calc(0.25rem * 0);
-    display: grid;
-    height: 100%;
-    max-height: none;
-    width: 100%;
-    max-width: none;
-    align-items: center;
-    justify-items: center;
-    background-color: transparent;
-    padding: calc(0.25rem * 0);
-    color: inherit;
-    overflow-x: hidden;
-    transition: translate 0.3s ease-out, visibility 0.3s allow-discrete, background-color 0.3s ease-out, opacity 0.1s ease-out;
-    overflow-y: hidden;
-    overscroll-behavior: contain;
-    z-index: 999;
-    scrollbar-gutter: auto;
-  }
-  .modal::backdrop {
-    display: none;
-  }
-  .modal.modal-open, .modal[open], .modal:target {
-    pointer-events: auto;
-    visibility: visible;
-    opacity: 100%;
-    background-color: oklch(0% 0 0/ 0.4);
-  }
-  .modal.modal-open .modal-box, .modal[open] .modal-box, .modal:target .modal-box {
-    translate: 0 0;
-    scale: 1;
-    opacity: 1;
-  }
-  @starting-style {
-    .modal.modal-open, .modal[open], .modal:target {
-      visibility: hidden;
-      opacity: 0%;
-    }
-  }
   .menu {
     display: flex;
     width: fit-content;
@@ -1658,6 +1610,9 @@
   .bg-green-200 {
     background-color: var(--color-green-200);
   }
+  .bg-green-400 {
+    background-color: var(--color-green-400);
+  }
   .bg-green-500 {
     background-color: var(--color-green-500);
   }
@@ -1759,9 +1714,6 @@
   .text-left {
     text-align: left;
   }
-  .font-mono {
-    font-family: var(--font-mono);
-  }
   .font-sans {
     font-family: var(--font-sans);
   }
@@ -1787,10 +1739,6 @@
   .text-6xl {
     font-size: var(--text-6xl);
     line-height: var(--tw-leading, var(--text-6xl--line-height));
-  }
-  .text-7xl {
-    font-size: var(--text-7xl);
-    line-height: var(--tw-leading, var(--text-7xl--line-height));
   }
   .text-lg {
     font-size: var(--text-lg);
@@ -1822,14 +1770,6 @@
   .font-bold {
     --tw-font-weight: var(--font-weight-bold);
     font-weight: var(--font-weight-bold);
-  }
-  .font-extrabold {
-    --tw-font-weight: var(--font-weight-extrabold);
-    font-weight: var(--font-weight-extrabold);
-  }
-  .font-light {
-    --tw-font-weight: var(--font-weight-light);
-    font-weight: var(--font-weight-light);
   }
   .font-medium {
     --tw-font-weight: var(--font-weight-medium);
@@ -1885,29 +1825,17 @@
   .text-gray-800 {
     color: var(--color-gray-800);
   }
-  .text-green-300 {
-    color: var(--color-green-300);
-  }
   .text-green-400 {
     color: var(--color-green-400);
   }
   .text-green-500 {
     color: var(--color-green-500);
   }
-  .text-green-600 {
-    color: var(--color-green-600);
-  }
   .text-green-900 {
     color: var(--color-green-900);
   }
-  .text-purple-400 {
-    color: var(--color-purple-400);
-  }
   .text-purple-500 {
     color: var(--color-purple-500);
-  }
-  .text-purple-800 {
-    color: var(--color-purple-800);
   }
   .text-red-400 {
     color: var(--color-red-400);
@@ -2067,6 +1995,11 @@
   @media (hover: hover) {
     .hover\:bg-green-700:hover {
       background-color: var(--color-green-700);
+    }
+  }
+  @media (hover: hover) {
+    .hover\:bg-green-800:hover {
+      background-color: var(--color-green-800);
     }
   }
   @media (hover: hover) {

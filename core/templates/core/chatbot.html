@@ -88,23 +88,35 @@
     <div id="rating-modal" class="fixed inset-0 bg-black/70 z-50 hidden items-center justify-center p-4">
         <div class="bg-gray-800 rounded-lg shadow-xl p-8 max-w-sm w-full relative">
             
-            <h3 class="text-2xl font-bold text-white mb-4">Rate Your Experience</h3>
+            <h3 class="text-2xl text-center font-bold text-white mb-4">Rate Your Experience</h3>
+            
+            <!-- Star Rating -->
             <div class="flex justify-center space-x-2 mb-6 star-rating">
-                <button data-value="1" class="text-3xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
-                <button data-value="2" class="text-3xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
-                <button data-value="3" class="text-3xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
-                <button data-value="4" class="text-3xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
-                <button data-value="5" class="text-3xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
+                <button data-value="1" class="text-4xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
+                <button data-value="2" class="text-4xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
+                <button data-value="3" class="text-4xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
+                <button data-value="4" class="text-4xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
+                <button data-value="5" class="text-4xl text-gray-500 hover:text-yellow-400 transition-colors">★</button>
             </div>
+
+            <!-- Feedback Textarea -->
             <div class="w-full mb-4">
-                <input type="text" placeholder="Type something..." class="w-full bg-gray-700 text-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                <textarea 
+                    placeholder="Share your feedback..." 
+                    class="w-full bg-gray-700 text-gray-200 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                    rows="4"
+                    id="feedback-textarea"
+                ></textarea>
             </div>
-            <div class="flex justify-end gap-4">
+
+            <!-- Buttons -->
+            <div class="flex justify-center gap-4">
                 <button id="close-modal-btn" class="py-2 px-4 rounded-lg bg-gray-600 hover:bg-gray-500 transition-colors">Close</button>
-                <button id="submit-rating-btn" class="py-2 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors">Submit</button>
+                <button id="submit-rating-btn" class="py-2 px-4 rounded-lg bg-green-600 hover:bg-green-800 transition-colors">Submit</button>
             </div>
         </div>
     </div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -126,13 +138,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const ratingModal = document.getElementById('rating-modal');
     const closeModalBtn = document.getElementById('close-modal-btn');
     const starRatingContainer = ratingModal.querySelector('.star-rating');
-    const modalMenuBtn = ratingModal.querySelector('.three-dot-menu-btn');
-    const modalDropdown = ratingModal.querySelector('.dropdown-menu'); // <-- CORRECTED THIS LINE
     
 
     let currentRating = 0;
     let currentChatId = null;
-    const chatListContainer = sidebar.querySelector('.flex-grow');
+    const chatListContainer = document.querySelector('#sidebar-content .flex-grow');
 
     // ================= Sidebar Toggle =================
     window.toggleSidebar = () => {
@@ -157,10 +167,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ================= Chat Handling =================
     async function fetchChats() {
-        const res = await fetch("/chat/history/");
-        if (!res.ok) return;
-        const data = await res.json();
-        renderChatList(data.chats);
+        try {
+            const res = await fetch("/chat/history/");
+            if (!res.ok) {
+                console.error("Fetch failed:", res.status);
+                return;
+            }
+            const data = await res.json();
+            console.log("Chats loaded:", data.chats); // ← Add this
+            renderChatList(data.chats);
+        } catch (err) {
+            console.error("Error in fetchChats:", err);
+        }
     }
 
     function renderChatList(chats) {
@@ -559,39 +577,13 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 
 
-    // --- Three-dot menu for Rating Modal ---
-    
-    modalMenuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        modalDropdown.classList.toggle('hidden');
-    });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!modalMenuBtn.contains(e.target) && !modalDropdown.contains(e.target)) {
-            modalDropdown.classList.add('hidden');
-        }
-    });
 
-    // Handle modal menu actions (UI only, no backend logic)
-    modalDropdown.querySelectorAll('button').forEach((btn, index) => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (index === 0) {
-                console.log('Rename rating clicked');
-                // Add rename UI logic here
-            } else {
-                console.log('Delete rating clicked');
-                // Add delete UI logic here
-            }
-            modalDropdown.classList.add('hidden');
-        });
-    });
 
     // ================= Init =================
     fetchChats();
 });
 </script>
+
 
 <style>
 .bot-message-entry {
