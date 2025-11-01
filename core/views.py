@@ -8,9 +8,6 @@ from django.views.decorators.cache import never_cache
 from django.http import JsonResponse, StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .chatbot_model_handler import ModelHandler
-from .rag_pipeline import retrieve_context, generate_answer
-
-
 import os
 from dotenv import load_dotenv
 import json
@@ -135,31 +132,11 @@ def chat_api_stream(request):
         def event_stream():
             bot_response = ""
             try:
-                # get context using RAG
-                context = retrieve_context(user_message)
-
-                prompt = f"""
-        You are VineBot, an AI assistant trained on the Blessed Vineyard Ministry Manual.
-        Use the context below to answer truthfully and concisely.
-        Do NOT add new dialogue, user questions, or repeat the question.
-
-        Context:
-        {context}
-
-        Question:
-        {user_message}
-
-        Final Answer:
-        """
-
-                # Stream response from the Hugging Face model
-                for chunk in model_handler.stream_response(prompt):
+                for chunk in model_handler.stream_response(user_message):
                     bot_response += chunk
-                    yield f"data: {chunk}\n\n"
-
+                    yield f"data: {chunk}\n\n"   # ✅ push each piece to browser
             except Exception as e:
                 yield f"data: Error: {str(e)}\n\n"
-
             finally:
                 if bot_response.strip():
                     Message.objects.create(chat=chat, sender="bot", content=bot_response)
