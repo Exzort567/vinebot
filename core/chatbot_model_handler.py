@@ -1,4 +1,5 @@
 from gradio_client import Client
+import psutil
 
 class ModelHandler:
     def __init__(self, space_name):
@@ -28,14 +29,17 @@ class ModelHandler:
     def stream_response(self, user_input):
         self._ensure_client()
         print(f"[DEBUG] Streaming from HF Space: {user_input}")
+        print(f"[MEMORY] Before stream: {psutil.Process().memory_info().rss / (1024 ** 2):.2f} MB")
         try:
             job = self.client.submit(user_input, api_name="/predict")
             for event in job:
                 if event is None:
                     continue
                 print(f"[DEBUG] Raw event from HF: {event!r}")
+                print(f"[MEMORY] During stream: {psutil.Process().memory_info().rss / (1024 ** 2):.2f} MB")
                 yield str(event)   # ✅ yield chunk immediately
         except Exception as e:
             print(f"[DEBUG] Exception in stream_response: {str(e)}")
             yield f"Error: {str(e)}"
+        print(f"[MEMORY] After stream: {psutil.Process().memory_info().rss / (1024 ** 2):.2f} MB")
 
