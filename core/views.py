@@ -8,6 +8,9 @@ from django.views.decorators.cache import never_cache
 from django.http import JsonResponse, StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .chatbot_model_handler import ModelHandler
+
+
+
 import os
 from dotenv import load_dotenv
 import json
@@ -103,8 +106,6 @@ def delete_chat(request, chat_id):
     except Chat.DoesNotExist:
         return JsonResponse({"error": "Chat not found"}, status=404)
     
-
-
 @csrf_exempt
 @login_required
 def chat_api_stream(request):
