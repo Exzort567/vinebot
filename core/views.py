@@ -135,7 +135,7 @@ def chat_api_stream(request):
             try:
                 for chunk in model_handler.stream_response(user_message):
                     bot_response += chunk
-                    yield f"data: {chunk}\n\n"   # ✅ push each piece to browser
+                    yield f"data: {chunk}\n\n"   
             except Exception as e:
                 yield f"data: Error: {str(e)}\n\n"
             finally:

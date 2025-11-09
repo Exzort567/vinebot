@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             const data = await res.json();
-            console.log("Chats loaded:", data.chats); // ← Add this
+            console.log("Chats loaded:", data.chats); 
             renderChatList(data.chats);
         } catch (err) {
             console.error("Error in fetchChats:", err);
@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dropdown.classList.add("chat-dropdown");
         button.parentElement.appendChild(dropdown);
 
-        // ✅ Close dropdown when clicking outside (delay binding to avoid instant close)
+        // Close dropdown when clicking outside 
         setTimeout(() => {
             document.addEventListener("click", (e) => {
                 if (!button.contains(e.target) && !dropdown.contains(e.target)) {
@@ -376,8 +376,6 @@ document.addEventListener('DOMContentLoaded', () => {
             botWrapper.appendChild(botBubble);
             chatMessages.appendChild(botWrapper);
 
-            // ✨ New: Trigger the animation after a tiny delay
-            // This ensures the browser renders the element before starting the transition.
             requestAnimationFrame(() => {
                 botWrapper.classList.add('visible');
             });
@@ -393,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (done) {
                     typingCursor.remove();
                     // Final formatting and display
-                    botTextSpan.innerHTML = formatBotResponse(botText.trim()); // trim() removes any trailing space
+                    botTextSpan.innerHTML = formatBotResponse(botText.trim()); 
                     botBubble.classList.remove('chatbot-typing-bubble');
                     break;
                 }
@@ -524,11 +522,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ✅ Add your submit rating code here
     const submitRatingBtn = document.getElementById('submit-rating-btn');
 
     submitRatingBtn.addEventListener('click', async () => {
-        const feedbackInput = ratingModal.querySelector('input[type="text"]');
+        const feedbackInput = ratingModal.querySelector('#feedback-textarea');
         const feedback = feedbackInput.value.trim();
 
         if (currentRating === 0) {
@@ -540,7 +537,7 @@ document.addEventListener('DOMContentLoaded', () => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRFToken": getCookie("csrftoken")   // ✅ now defined
+                "X-CSRFToken": getCookie("csrftoken")  
             },
             body: JSON.stringify({
                 stars: currentRating,
