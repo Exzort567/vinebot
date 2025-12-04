@@ -5,7 +5,7 @@ import time
 class ModelHandler:
     def __init__(self, space_name):
         self.space_name = space_name
-        self.client = None  # don’t connect yet
+        self.client = None 
 
     def _ensure_client(self):
         """Initialize the Hugging Face client only once, when needed."""
@@ -19,7 +19,7 @@ class ModelHandler:
         print(f"[DEBUG] Sending to HF Space: {user_input}")
         try:
             result = self.client.predict(
-                user_input,       # ✅ positional, no keyword
+                user_input,     
                 api_name="/predict"
             )
             return result
@@ -32,7 +32,7 @@ class ModelHandler:
         print(f"[DEBUG] Streaming from HF Space: {user_input}")
         print(f"[MEMORY] Before stream: {psutil.Process().memory_info().rss / (1024 ** 2):.2f} MB")
 
-        start_time = time.time()   # 🕒 start timer
+        start_time = time.time()  
         first_chunk_time = None
 
         try:
@@ -51,7 +51,7 @@ class ModelHandler:
                 print(f"[DEBUG] Raw event from HF: {event!r}")
                 print(f"[MEMORY] During stream: {psutil.Process().memory_info().rss / (1024 ** 2):.2f} MB")
 
-                yield str(event)  # ✅ yield chunk immediately
+                yield str(event) 
 
             # After the final chunk
             total_duration = time.time() - start_time

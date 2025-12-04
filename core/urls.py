@@ -23,5 +23,5 @@ urlpatterns = [
 
     # Chatbot APIs
     path("chat-api/", views.chat_api_stream, name="chat_api"),
-    path("chat-api/stream/", views.chat_api_stream, name="chat_api_stream"),  # ✅ Add this
+    path("chat-api/stream/", views.chat_api_stream, name="chat_api_stream"), 
 ]

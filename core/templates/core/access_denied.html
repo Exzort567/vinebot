@@ -6,19 +6,15 @@
 <div class="h-screen w-full flex items-center justify-center bg-cover bg-center"
      style="background-image: url('{% static "images/vinebotBG.png" %}');">
 
-  <!-- Card -->
   <div class="bg-black bg-opacity-25 rounded-2xl shadow-xl p-8 w-96 text-center">
 
 
-    
-    <!-- Logo -->
     <div class="bg-white rounded-2xl p-2 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
       <img src="{% static 'images/vinebotLogo.png' %}" alt="Logo" class="w-20 h-16 object-contain">
     </div>
 
     <h2 class="text-red-800 text-xl font-semibold mb-6">You are not Authorized</h2>
 
-    <!-- Go back to Login -->
     <a href="{% url 'login' %}" 
        class="flex items-center justify-center gap-2 w-full py-3 mb-6 bg-gray-900 rounded-lg shadow hover:bg-gray-700 transition">
 
