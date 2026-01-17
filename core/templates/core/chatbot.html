@@ -185,7 +185,9 @@ document.addEventListener('DOMContentLoaded', () => {
         chatListContainer.innerHTML = "";
         chats.forEach(chat => {
             const chatItem = document.createElement("div");
-            chatItem.className = "group flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer relative";
+            // Add 'selected-chat' and 'bg-gray-700' if this is the current chat
+            const isSelected = chat.id === currentChatId;
+            chatItem.className = `group flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-700 cursor-pointer relative ${isSelected ? 'bg-gray-700 selected-chat' : ''}`;
             chatItem.dataset.chatId = chat.id;
 
             const titleSpan = document.createElement("span");
@@ -223,8 +225,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.innerWidth < 1024) toggleSidebar();
     }
 
+    // ================= Highlight Selected Chat =================
+    function highlightSelectedChat(chatId) {
+        // Remove 'selected' styling from all chat items
+        document.querySelectorAll('[data-chat-id]').forEach(item => {
+            item.classList.remove('bg-gray-700', 'selected-chat');
+        });
+        
+        // Add 'selected' styling to the current chat
+        const selectedItem = document.querySelector(`[data-chat-id="${chatId}"]`);
+        if (selectedItem) {
+            selectedItem.classList.add('bg-gray-700', 'selected-chat');
+        }
+    }
+
     async function loadChat(chatId) {
         currentChatId = chatId;
+        
+        // Highlight the selected chat in the sidebar
+        highlightSelectedChat(chatId);
+        
         const res = await fetch(`/chat/${chatId}/messages/`);
         if (!res.ok) return;
         const data = await res.json();
@@ -268,9 +288,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showChatMenu(button, chatId, chatTitle) {
+        // Remove any existing dropdown first
+        document.querySelectorAll(".chat-dropdown").forEach(el => el.remove());
+
         // Create dropdown menu dynamically
         const dropdown = document.createElement("div");
-        dropdown.className = "absolute right-0 mt-2 w-32 bg-gray-700 rounded-md shadow-lg py-1 z-20";
+        dropdown.className = "fixed w-32 bg-gray-700 rounded-md shadow-lg py-1 z-50";
+        dropdown.classList.add("chat-dropdown");
 
         // Rename button
         const renameBtn = document.createElement("button");
@@ -295,10 +319,13 @@ document.addEventListener('DOMContentLoaded', () => {
         dropdown.appendChild(renameBtn);
         dropdown.appendChild(deleteBtn);
 
-        // Remove any existing dropdown first
-        document.querySelectorAll(".chat-dropdown").forEach(el => el.remove());
-        dropdown.classList.add("chat-dropdown");
-        button.parentElement.appendChild(dropdown);
+        // Append to body instead of parent to avoid clipping
+        document.body.appendChild(dropdown);
+
+        // Position the dropdown relative to the button
+        const buttonRect = button.getBoundingClientRect();
+        dropdown.style.top = `${buttonRect.bottom + 4}px`;
+        dropdown.style.left = `${buttonRect.right - dropdown.offsetWidth}px`;
 
         // Close dropdown when clicking outside 
         setTimeout(() => {
